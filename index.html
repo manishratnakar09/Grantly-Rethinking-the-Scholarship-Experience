@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grantly – Scholarships made simple</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--tx:#1b1f2a;--mu:#667085;--bd:#e4e7ee;--pri:#4f46e5;--pt:#fff;--ok:#12805c;--okb:#e3f6ee;--wn:#b54708;--wnb:#fff1e0;--er:#b42318;--erb:#fde8e6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1220;--card:#181c2e;--tx:#eceef6;--mu:#9aa3b8;--bd:#2a3047;--pri:#8b85ff;--pt:#0f1220;--ok:#5fd6a4;--okb:#12352a;--wn:#ffb766;--wnb:#3a2812;--er:#ff8f85;--erb:#3b1714}}
+:root[data-theme=dark]{--bg:#0f1220;--card:#181c2e;--tx:#eceef6;--mu:#9aa3b8;--bd:#2a3047;--pri:#8b85ff;--pt:#0f1220;--ok:#5fd6a4;--okb:#12352a;--wn:#ffb766;--wnb:#3a2812;--er:#ff8f85;--erb:#3b1714}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.w{max-width:880px;margin:0 auto;padding:16px}
+h1{font-size:26px;margin:4px 0}h2{font-size:17px;margin:0 0 4px}p{margin:0}
+.mu{color:var(--mu)}.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1 1 140px}
+label{font-size:12px;color:var(--mu);display:block;margin-bottom:3px}
+select,input[type=number],input[type=search]{width:100%;padding:9px;border:1px solid var(--bd);border-radius:9px;background:var(--bg);color:var(--tx);font:inherit}
+button{font:inherit;border:0;border-radius:9px;padding:9px 14px;background:var(--pri);color:var(--pt);cursor:pointer;font-weight:600}
+button:disabled{opacity:.5}button.g{background:transparent;color:var(--pri);border:1px solid var(--bd)}
+.tabs{display:flex;gap:6px;margin:12px 0}.tabs button{flex:1;background:var(--card);color:var(--tx);border:1px solid var(--bd)}.tabs button.on{background:var(--pri);color:var(--pt)}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--okb);color:var(--ok);margin:2px 4px 2px 0}
+.tag.w2{background:var(--wnb);color:var(--wn)}.tag.e{background:var(--erb);color:var(--er)}
+.top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.amt{font-weight:700;font-size:17px;white-space:nowrap}
+.bar{height:6px;background:var(--bd);border-radius:9px;overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:var(--pri)}
+.chk{display:flex;gap:8px;align-items:center;padding:3px 0;font-size:14px;color:var(--tx)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.stats .card{margin:0;text-align:center}.stats b{font-size:20px;display:block}
+.hid{display:none}
+</style></head><body><div class="w">
+<div class="top"><div><h1>🎓 Grantly</h1><p class="mu">Tell us about you once. We’ll find, rank and track scholarships for you.</p></div><button class="g" id="tg">◐</button></div>
+<div class="card" style="margin-top:12px"><h2>1 · Your profile</h2>
+<div class="row">
+<div><label>Level</label><select id="lvl"><option value="school">School</option><option value="ug" selected>Undergraduate</option><option value="pg">Postgraduate</option></select></div>
+<div><label>Field</label><select id="fld"><option value="tech">Tech / Engineering / BCA</option><option value="sci">Science</option><option value="com">Commerce / Arts</option><option value="med">Medical</option></select></div>
+<div><label>Category</label><select id="cat"><option>General</option><option>OBC</option><option>SC</option><option>ST</option><option>EWS</option></select></div>
+<div><label>Gender</label><select id="gen"><option>Female</option><option>Male</option><option>Other</option></select></div>
+<div><label>Family income (₹ lakh/yr)</label><input type="number" id="inc" min="0" step="0.5" value="4"></div>
+<div><label>Last marks (%)</label><input type="number" id="mk" min="0" max="100" value="75"></div>
+</div></div>
+<div class="tabs"><button class="on" data-t="d">🔍 Discover</button><button data-t="t">📌 My tracker</button></div>
+<div id="d">
+<div class="row" style="margin-bottom:12px"><input type="search" id="q" placeholder="Search by name or provider…"><select id="srt"><option value="m">Best match</option><option value="a">Highest amount</option><option value="dl">Closest deadline</option></select></div>
+<div id="list"></div>
+<p class="mu" style="font-size:12px">Demo data: scholarships shown are illustrative samples for this prototype, not real listings. Always verify on the official portal.</p></div>
+<div id="t" class="hid"><div class="stats" id="st"></div><div id="tr"></div></div>
+</div>
+<script>
+const D=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+const S=[
+{id:1,n:"National Merit Excellence Grant",p:"Education Ministry (sample)",a:50000,d:D(21),lv:["ug","pg"],mm:70,inc:8,docs:["Marksheet","Income certificate","Aadhaar","Bank passbook"]},
+{id:2,n:"Women in Tech Scholarship",p:"TechBridge Foundation (sample)",a:75000,d:D(9),lv:["ug","pg"],f:["tech"],g:"Female",mm:60,inc:10,docs:["Marksheet","College ID","Statement of purpose","Aadhaar"]},
+{id:3,n:"SC/ST Post-Matric Support",p:"State Welfare Dept (sample)",a:30000,d:D(45),lv:["ug","pg"],c:["SC","ST"],inc:2.5,docs:["Caste certificate","Income certificate","Marksheet","Bank passbook"]},
+{id:4,n:"Future Coders Fellowship",p:"OpenCode Trust (sample)",a:100000,d:D(30),lv:["ug"],f:["tech"],mm:75,inc:12,docs:["Marksheet","GitHub/portfolio link","Recommendation letter","Aadhaar"]},
+{id:5,n:"EWS Education Aid",p:"Central Scheme (sample)",a:25000,d:D(14),lv:["ug","pg","school"],c:["EWS","General"],inc:3,docs:["EWS certificate","Income certificate","Marksheet"]},
+{id:6,n:"Young Scientist Award",p:"Science Council (sample)",a:60000,d:D(60),lv:["ug","pg"],f:["sci","tech"],mm:80,docs:["Marksheet","Project abstract","Recommendation letter"]},
+{id:7,n:"OBC Higher Study Scholarship",p:"Backward Classes Board (sample)",a:35000,d:D(5),lv:["ug","pg"],c:["OBC"],inc:4.5,docs:["Caste certificate","Income certificate","Marksheet","Aadhaar"]},
+{id:8,n:"Medical Aspirants Bursary",p:"HealthFirst Trust (sample)",a:120000,d:D(40),lv:["ug","pg"],f:["med"],mm:70,inc:6,docs:["Marksheet","Admission letter","Income certificate"]},
+{id:9,n:"School Topper Stipend",p:"District Trust (sample)",a:12000,d:D(25),lv:["school"],mm:85,inc:5,docs:["Marksheet","School certificate","Parent ID"]}];
+let T={};try{T=JSON.parse(localStorage.getItem("gr")||"{}")}catch(e){}
+const sv=()=>{try{localStorage.setItem("gr",JSON.stringify(T))}catch(e){}};
+const $=i=>document.getElementById(i),inr=n=>"₹"+n.toLocaleString("en-IN");
+const dl=d=>Math.ceil((new Date(d)-new Date(new Date().toDateString()))/864e5);
+const pf=()=>({lv:$("lvl").value,f:$("fld").value,c:$("cat").value,g:$("gen").value,inc:+$("inc").value,mk:+$("mk").value});
+function ev(s,u){const ok=[],no=[],t=(c,y,n)=>(c?ok:no).push(c?y:n);
+t(s.lv.includes(u.lv),"Level fits","Not for your level");
+if(s.f)t(s.f.includes(u.f),"Field fits","Different field");
+if(s.c)t(s.c.includes(u.c),"Category fits","Category: "+s.c.join("/"));
+if(s.g)t(s.g===u.g,"Gender criterion fits","For "+s.g+" applicants");
+if(s.inc!=null)t(u.inc<=s.inc,"Income under ₹"+s.inc+"L","Income limit ₹"+s.inc+"L");
+if(s.mm)t(u.mk>=s.mm,"Marks ≥ "+s.mm+"%","Needs "+s.mm+"%+ marks");
+return{ok,no,score:Math.round(ok.length/(ok.length+no.length)*100)}}
+function render(){const u=pf(),q=$("q").value.toLowerCase(),m=$("srt").value;
+let r=S.filter(s=>dl(s.d)>=0&&(s.n+s.p).toLowerCase().includes(q)).map(s=>({s,e:ev(s,u)}));
+r.sort((a,b)=>m=="a"?b.s.a-a.s.a:m=="dl"?dl(a.s.d)-dl(b.s.d):b.e.score-a.e.score);
+$("list").innerHTML=r.map(({s,e})=>{const k=dl(s.d),el=!e.no.length,x=T[s.id];
+return`<div class="card"><div class="top"><div><h2>${s.n}</h2><p class="mu">${s.p}</p></div><div class="amt">${inr(s.a)}</div></div>
+<div class="bar"><i style="width:${e.score}%"></i></div>
+<p><b>${e.score}% match</b> · ${el?"✅ You look eligible":"⚠️ Partly eligible"} · <span class="tag ${k<=10?"e":"w2"}">${k} days left</span></p>
+<div>${e.ok.map(v=>`<span class="tag">✓ ${v}</span>`).join("")}${e.no.map(v=>`<span class="tag e">✗ ${v}</span>`).join("")}</div>
+<p style="margin-top:8px"><button ${x?"disabled":""} onclick="add(${s.id})">${x?"Tracking ✓":"+ Track this"}</button></p></div>`}).join("")||'<p class="mu">No scholarships found.</p>'}
+function add(id){const s=S.find(x=>x.id==id);T[id]={st:"Saved",docs:s.docs.map(()=>0)};sv();render();tr()}
+function setS(id,v){T[id].st=v;sv();tr()}
+function tick(id,i){T[id].docs[i]^=1;sv();tr()}
+function rm(id){delete T[id];sv();tr();render()}
+function tr(){const ids=Object.keys(T),c=x=>ids.filter(i=>T[i].st==x).length;
+$("st").innerHTML=["Saved","Applying","Applied"].map(x=>`<div class="card"><b>${c(x)}</b><span class="mu">${x}</span></div>`).join("");
+ids.sort((a,b)=>dl(S.find(s=>s.id==a).d)-dl(S.find(s=>s.id==b).d));
+$("tr").innerHTML=ids.map(i=>{const s=S.find(x=>x.id==i),t=T[i],k=dl(s.d),dn=t.docs.reduce((a,b)=>a+b,0),pc=Math.round(dn/t.docs.length*100);
+return`<div class="card"><div class="top"><div><h2>${s.n}</h2><p class="mu">${inr(s.a)} · <span class="tag ${k<=7?"e":"w2"}">${k} days left</span></p></div>
+<select style="width:auto" onchange="setS(${i},this.value)">${["Saved","Applying","Applied","Awarded","Rejected"].map(x=>`<option ${x==t.st?"selected":""}>${x}</option>`).join("")}</select></div>
+<div class="bar"><i style="width:${pc}%"></i></div><p class="mu" style="font-size:13px">Documents ready: ${dn}/${t.docs.length}</p>
+${s.docs.map((d,j)=>`<label class="chk"><input type="checkbox" ${t.docs[j]?"checked":""} onchange="tick(${i},${j})"> ${d}</label>`).join("")}
+<p style="margin-top:6px"><button class="g" onclick="rm(${i})">Remove</button></p></div>`}).join("")||'<p class="mu">Nothing tracked yet. Go to Discover and tap “+ Track this”.</p>'}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x==b));$("d").classList.toggle("hid",b.dataset.t!="d");$("t").classList.toggle("hid",b.dataset.t!="t");tr()});
+["lvl","fld","cat","gen","inc","mk","q","srt"].forEach(i=>$(i).addEventListener("input",render));
+$("tg").onclick=()=>{const r=document.documentElement,dk=getComputedStyle(r).getPropertyValue("--bg").trim()=="#0f1220";r.dataset.theme=dk?"light":"dark"};
+render();tr();
+</script></body></html>
